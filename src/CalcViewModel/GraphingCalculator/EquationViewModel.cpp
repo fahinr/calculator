@@ -52,48 +52,58 @@ namespace CalculatorApp::ViewModel
 
     void EquationViewModel::PopulateKeyGraphFeatures(KeyGraphFeaturesInfo ^ graphEquation)
     {
-        if (graphEquation->AnalysisError != 0)
+        try
         {
-            AnalysisErrorVisible = true;
-            if (graphEquation->AnalysisError == static_cast<int>(AnalysisErrorType::AnalysisCouldNotBePerformed))
+            if (graphEquation->AnalysisError != 0)
             {
-                AnalysisErrorString = m_resourceLoader->GetString(L"KGFAnalysisCouldNotBePerformed");
+                AnalysisErrorVisible = true;
+                if (graphEquation->AnalysisError == static_cast<int>(AnalysisErrorType::AnalysisCouldNotBePerformed))
+                {
+                    AnalysisErrorString = m_resourceLoader->GetString(L"KGFAnalysisCouldNotBePerformed");
+                }
+                else if (graphEquation->AnalysisError == static_cast<int>(AnalysisErrorType::AnalysisNotSupported))
+                {
+                    AnalysisErrorString = m_resourceLoader->GetString(L"KGFAnalysisNotSupported");
+                }
+                else if (graphEquation->AnalysisError == static_cast<int>(AnalysisErrorType::VariableIsNotX))
+                {
+                    AnalysisErrorString = m_resourceLoader->GetString(L"KGFVariableIsNotX");
+                }
+                return;
             }
-            else if (graphEquation->AnalysisError == static_cast<int>(AnalysisErrorType::AnalysisNotSupported))
+    
+            KeyGraphFeaturesItems->Clear();
+    
+            AddKeyGraphFeature(m_resourceLoader->GetString(L"Domain"), graphEquation->Domain, m_resourceLoader->GetString(L"KGFDomainNone"));
+            AddKeyGraphFeature(m_resourceLoader->GetString(L"Range"), graphEquation->Range, m_resourceLoader->GetString(L"KGFRangeNone"));
+            AddKeyGraphFeature(m_resourceLoader->GetString(L"XIntercept"), graphEquation->XIntercept, m_resourceLoader->GetString(L"KGFXInterceptNone"));
+            AddKeyGraphFeature(m_resourceLoader->GetString(L"YIntercept"), graphEquation->YIntercept, m_resourceLoader->GetString(L"KGFYInterceptNone"));
+            AddKeyGraphFeature(m_resourceLoader->GetString(L"Minima"), graphEquation->Minima, m_resourceLoader->GetString(L"KGFMinimaNone"));
+            AddKeyGraphFeature(m_resourceLoader->GetString(L"Maxima"), graphEquation->Maxima, m_resourceLoader->GetString(L"KGFMaximaNone"));
+            AddKeyGraphFeature(
+                m_resourceLoader->GetString(L"InflectionPoints"), graphEquation->InflectionPoints, m_resourceLoader->GetString(L"KGFInflectionPointsNone"));
+            AddKeyGraphFeature(
+                m_resourceLoader->GetString(L"VerticalAsymptotes"), graphEquation->VerticalAsymptotes, m_resourceLoader->GetString(L"KGFVerticalAsymptotesNone"));
+            AddKeyGraphFeature(
+                m_resourceLoader->GetString(L"HorizontalAsymptotes"),
+                graphEquation->HorizontalAsymptotes,
+                m_resourceLoader->GetString(L"KGFHorizontalAsymptotesNone"));
+            AddKeyGraphFeature(
+                m_resourceLoader->GetString(L"ObliqueAsymptotes"), graphEquation->ObliqueAsymptotes, m_resourceLoader->GetString(L"KGFObliqueAsymptotesNone"));
+            AddParityKeyGraphFeature(graphEquation);
+            AddPeriodicityKeyGraphFeature(graphEquation);
+            AddMonotoncityKeyGraphFeature(graphEquation);
+            AddTooComplexKeyGraphFeature(graphEquation);
+    
+            AnalysisErrorVisible = false;
+                
+            }
+            catch (Exception^ ex)
             {
-                AnalysisErrorString = m_resourceLoader->GetString(L"KGFAnalysisNotSupported");
+                AnalysisErrorVisible = true;
+                AnalysisErrorString = "Invalid input: " + ex->Message;
             }
-            else if (graphEquation->AnalysisError == static_cast<int>(AnalysisErrorType::VariableIsNotX))
-            {
-                AnalysisErrorString = m_resourceLoader->GetString(L"KGFVariableIsNotX");
-            }
-            return;
-        }
-
-        KeyGraphFeaturesItems->Clear();
-
-        AddKeyGraphFeature(m_resourceLoader->GetString(L"Domain"), graphEquation->Domain, m_resourceLoader->GetString(L"KGFDomainNone"));
-        AddKeyGraphFeature(m_resourceLoader->GetString(L"Range"), graphEquation->Range, m_resourceLoader->GetString(L"KGFRangeNone"));
-        AddKeyGraphFeature(m_resourceLoader->GetString(L"XIntercept"), graphEquation->XIntercept, m_resourceLoader->GetString(L"KGFXInterceptNone"));
-        AddKeyGraphFeature(m_resourceLoader->GetString(L"YIntercept"), graphEquation->YIntercept, m_resourceLoader->GetString(L"KGFYInterceptNone"));
-        AddKeyGraphFeature(m_resourceLoader->GetString(L"Minima"), graphEquation->Minima, m_resourceLoader->GetString(L"KGFMinimaNone"));
-        AddKeyGraphFeature(m_resourceLoader->GetString(L"Maxima"), graphEquation->Maxima, m_resourceLoader->GetString(L"KGFMaximaNone"));
-        AddKeyGraphFeature(
-            m_resourceLoader->GetString(L"InflectionPoints"), graphEquation->InflectionPoints, m_resourceLoader->GetString(L"KGFInflectionPointsNone"));
-        AddKeyGraphFeature(
-            m_resourceLoader->GetString(L"VerticalAsymptotes"), graphEquation->VerticalAsymptotes, m_resourceLoader->GetString(L"KGFVerticalAsymptotesNone"));
-        AddKeyGraphFeature(
-            m_resourceLoader->GetString(L"HorizontalAsymptotes"),
-            graphEquation->HorizontalAsymptotes,
-            m_resourceLoader->GetString(L"KGFHorizontalAsymptotesNone"));
-        AddKeyGraphFeature(
-            m_resourceLoader->GetString(L"ObliqueAsymptotes"), graphEquation->ObliqueAsymptotes, m_resourceLoader->GetString(L"KGFObliqueAsymptotesNone"));
-        AddParityKeyGraphFeature(graphEquation);
-        AddPeriodicityKeyGraphFeature(graphEquation);
-        AddMonotoncityKeyGraphFeature(graphEquation);
-        AddTooComplexKeyGraphFeature(graphEquation);
-
-        AnalysisErrorVisible = false;
+        
     }
 
     void EquationViewModel::AddKeyGraphFeature(String ^ title, String ^ expression, String ^ errorString)
